@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from './api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Sparkles, UserPlus, Users, Trophy, QrCode, CheckCircle, ArrowLeft, ScanLine, Lock, KeyRound } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -121,7 +122,7 @@ const App = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`http://${window.location.hostname}:5000/api/register`, {
+      const response = await api.post('/api/register', {
         teamName,
         players,
         backupPlayer,

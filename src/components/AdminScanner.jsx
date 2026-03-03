@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import axios from 'axios';
+import api from '../api';
 import { QrCode, ArrowLeft, Loader2 } from 'lucide-react';
 import VerificationResult from './VerificationResult';
 import { motion } from 'framer-motion';
@@ -28,7 +29,7 @@ const AdminScanner = ({ onBack }) => {
                     // It's not JSON, assume raw string
                 }
 
-                const response = await axios.get(`http://${window.location.hostname}:5000/api/team/${teamIdString}`);
+                const response = await api.get(`/api/team/${teamIdString}`);
                 setTeamData(response.data);
             } catch (err) {
                 setError(err.response?.data?.error || 'Failed to verify. Invalid QR code or server error.');
@@ -41,7 +42,7 @@ const AdminScanner = ({ onBack }) => {
     const handleVerifyTeam = async () => {
         try {
             setLoading(true);
-            const response = await axios.post(`http://${window.location.hostname}:5000/api/team/${teamData.teamId}/verify`);
+            const response = await api.post(`/api/team/${teamData.teamId}/verify`);
             setTeamData(response.data.team);
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to update verification status.');

@@ -14,7 +14,8 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb://127.0.0.1:27017/ffmax')
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ffmax';
+mongoose.connect(MONGODB_URI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
@@ -81,6 +82,12 @@ app.post('/api/team/:teamId/verify', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Ensure development environments still start the server locally
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running locally on port ${PORT}`);
+    });
+}
+
+// Export for Vercel Serverless
+export default app;

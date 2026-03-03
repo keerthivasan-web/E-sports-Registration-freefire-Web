@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import api from './api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Sparkles, UserPlus, Users, Trophy, QrCode, CheckCircle, ArrowLeft, ScanLine, Lock, KeyRound } from 'lucide-react';
-
-import axios from 'axios';
 import AdminScanner from './components/AdminScanner';
 
 const BulletEffect = () => {
@@ -404,7 +402,7 @@ const App = () => {
                 <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrPayload)}`} alt="Team QR Code" style={{ width: 200, height: 200 }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1rem', textAlign: 'left', background: 'var(--bg-input)', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem' }}>
+              <div className="roster-grid" style={{ textAlign: 'left', background: 'var(--bg-input)', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem' }}>
                 <div>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Main Roster</span>
                   <ul style={{ listStyle: 'none', padding: 0, marginTop: '0.5rem' }}>

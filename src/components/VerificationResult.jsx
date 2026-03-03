@@ -41,7 +41,7 @@ const VerificationResult = ({ team, onBack, onVerify, loading }) => {
                     <span className="badge">Roster Found</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div className="roster-grid" style={{ marginBottom: '1rem' }}>
                     <div>
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <Users size={14} /> Main Roster

@@ -68,7 +68,7 @@ app.post('/api/team/:teamId/verify', async (req, res) => {
         const team = await Team.findOneAndUpdate(
             { teamId: req.params.teamId },
             { isVerified: true },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!team) {

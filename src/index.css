@@ -232,6 +232,12 @@ h6 {
   margin-top: 1rem;
 }
 
+.roster-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -283,4 +289,110 @@ h6 {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease forwards;
+}
+
+/* ============================================
+   MOBILE-FIRST RESPONSIVE STYLES
+   ============================================ */
+
+/* Tablets and small desktops */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+    padding-top: 4rem;
+    /* space for fixed admin button */
+    justify-content: flex-start;
+  }
+
+  .glass-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-md);
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Player grid becomes single column on mobile */
+  .players-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .form-input {
+    font-size: 16px;
+    /* prevents iOS auto-zoom on focus */
+    padding: 0.9rem 1rem;
+  }
+
+  .btn {
+    font-size: 1.1rem;
+    padding: 0.6rem 1.5rem;
+    clip-path: none;
+    /* remove skewed shape on mobile */
+    border-radius: var(--radius-md);
+  }
+
+  /* Admin Mode button — fixed top-right, always reachable */
+  button[style*="position: fixed"] {
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Success page QR */
+  .qr-wrapper {
+    padding: 1rem;
+  }
+
+  /* Two-column roster grid → single column */
+  .roster-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Background flashlight effect smaller on mobile */
+  .bg-reveal-image {
+    mask-image: radial-gradient(circle 180px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle 180px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%);
+    background-size: 100%;
+  }
+}
+
+/* Small phones */
+@media (max-width: 420px) {
+  .app-container {
+    padding: 0.75rem;
+    padding-top: 3.5rem;
+  }
+
+  .glass-card {
+    padding: 1.25rem 1rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+}
+
+/* Fix iOS Safari 100vh issue */
+@supports (-webkit-touch-callout: none) {
+  .app-container {
+    min-height: -webkit-fill-available;
+  }
 }

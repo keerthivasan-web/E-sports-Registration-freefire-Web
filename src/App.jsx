@@ -121,7 +121,7 @@ const App = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:5000/api/register', {
+      const response = await axios.post(`http://${window.location.hostname}:5000/api/register`, {
         teamName,
         players,
         backupPlayer,

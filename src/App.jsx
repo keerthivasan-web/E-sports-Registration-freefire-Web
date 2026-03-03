@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from './api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Sparkles, UserPlus, Users, Trophy, QrCode, CheckCircle, ArrowLeft, ScanLine, Lock, KeyRound } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import axios from 'axios';
 import AdminScanner from './components/AdminScanner';
 
@@ -401,7 +401,7 @@ const App = () => {
               <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Your squad <strong>{teamName}</strong> has been secured in the database. Scan the QR code below at the venue to verify your participation.</p>
 
               <div style={{ background: '#ffffff', padding: '1.5rem', borderRadius: '16px', display: 'inline-block', marginBottom: '2rem', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                <QRCodeSVG value={qrPayload} size={200} level="H" fgColor="#0f1016" />
+                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrPayload)}`} alt="Team QR Code" style={{ width: 200, height: 200 }} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1rem', textAlign: 'left', background: 'var(--bg-input)', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem' }}>

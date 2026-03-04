@@ -44,9 +44,9 @@ const App = () => {
   const [teamName, setTeamName] = useState('');
   const [players, setPlayers] = useState(['', '', '', '']);
   const [backupPlayer, setBackupPlayer] = useState('');
+  const [rollNumber, setRollNumber] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const [qrPayload, setQrPayload] = useState('');
-  const [transactionId, setTransactionId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -113,8 +113,8 @@ const App = () => {
     e.preventDefault();
     setError('');
 
-    if (!teamName || players.some(p => !p) || !backupPlayer || !transactionId) {
-      setError("Please fill out all fields including Transaction ID.");
+    if (!teamName || players.some(p => !p) || !backupPlayer || !rollNumber) {
+      setError('Please fill all required fields including your College Roll Number');
       return;
     }
 
@@ -124,7 +124,7 @@ const App = () => {
         teamName,
         players,
         backupPlayer,
-        transactionId
+        rollNumber
       });
 
       setQrPayload(JSON.stringify({ teamId: response.data.teamId }));
@@ -140,7 +140,7 @@ const App = () => {
     setTeamName('');
     setPlayers(['', '', '', '']);
     setBackupPlayer('');
-    setTransactionId('');
+    setRollNumber('');
     setIsRegistered(false);
     setError('');
   };
@@ -341,23 +341,21 @@ const App = () => {
                 </div>
 
                 <h4 style={{ color: 'var(--primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <QrCode size={18} /> Payment Verification
+                  <QrCode size={18} /> College Roll Number
                 </h4>
                 <div className="form-group" style={{ marginBottom: '2.5rem' }}>
                   <div style={{ background: 'var(--bg-input)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', border: '1px dashed var(--primary)' }}>
-                    <p style={{ margin: 0, color: 'var(--text-main)', fontSize: '0.95rem' }}>Please pay the registration fee to the following number via UPI / Mobile Wallet:</p>
-                    <h3 style={{ margin: '0.5rem 0', color: 'var(--primary)', letterSpacing: '1px', fontSize: '1.5rem' }}>7868881629</h3>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>After successful payment, enter the Transaction ID below.</p>
+                    <p style={{ margin: 0, color: 'var(--text-main)', fontSize: '0.95rem' }}>Please enter your college roll number for verification.</p>
                   </div>
                   <label className="form-label">
-                    Transaction / Reference ID
+                    College Roll Number
                   </label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="Enter 12-digit UPI / Transaction ID"
-                    value={transactionId}
-                    onChange={(e) => setTransactionId(e.target.value)}
+                    placeholder="E.g., 21CS105"
+                    value={rollNumber}
+                    onChange={(e) => setRollNumber(e.target.value)}
                     required
                   />
                 </div>
@@ -416,8 +414,8 @@ const App = () => {
               </div>
 
               <div style={{ background: 'var(--bg-input)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', textAlign: 'left' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Payment Reference</span>
-                <div style={{ marginTop: '0.5rem', fontWeight: 500, color: 'var(--text-main)' }}>TRX: {transactionId}</div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>College Details</span>
+                <div style={{ marginTop: '0.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Roll No: {rollNumber}</div>
               </div>
 
               <motion.button

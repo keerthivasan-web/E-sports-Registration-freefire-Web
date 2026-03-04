@@ -15,7 +15,7 @@ const teamSchema = new mongoose.Schema({
         validate: [v => v.length === 4, 'A team must have exactly 4 players']
     },
     backupPlayer: { type: String, required: true },
-    transactionId: { type: String, required: true, unique: true },
+    rollNumber: { type: String, required: true, unique: true },
     isVerified: { type: Boolean, default: false },
     timestamp: { type: Date, default: Date.now }
 });
@@ -41,15 +41,15 @@ async function connectDB() {
 app.post('/api/register', async (req, res) => {
     try {
         await connectDB();
-        const { teamName, players, backupPlayer, transactionId } = req.body;
+        const { teamName, players, backupPlayer, rollNumber } = req.body;
 
-        const existingTeam = await Team.findOne({ transactionId });
+        const existingTeam = await Team.findOne({ rollNumber });
         if (existingTeam) {
-            return res.status(400).json({ error: 'Transaction ID already used. Please provide a valid unique transaction ID.' });
+            return res.status(400).json({ error: 'College Roll Number already used. Please provide a valid unique Roll Number.' });
         }
 
         const teamId = `FF-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-        const newTeam = new Team({ teamId, teamName, players, backupPlayer, transactionId });
+        const newTeam = new Team({ teamId, teamName, players, backupPlayer, rollNumber });
         await newTeam.save();
 
         res.status(201).json({ teamId, message: 'Registration successful' });

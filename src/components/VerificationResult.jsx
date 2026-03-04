@@ -72,7 +72,7 @@ const VerificationResult = ({ team, onBack, onVerify, loading }) => {
                         Sub: {team.backupPlayer}
                     </div>
                     <div style={{ marginTop: '0.5rem', padding: '0.5rem 0', borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'monospace' }}>
-                        TID: {team.transactionId}
+                        Roll No: {team.rollNumber}
                     </div>
                 </motion.div>
 
@@ -137,8 +137,8 @@ const VerificationResult = ({ team, onBack, onVerify, loading }) => {
                 </div>
 
                 <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Transaction ID</span>
-                    <div style={{ marginTop: '0.25rem', fontFamily: 'monospace', fontSize: '1.1rem', color: 'var(--text-main)' }}>{team.transactionId}</div>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>College Roll Number</span>
+                    <div style={{ marginTop: '0.25rem', fontFamily: 'monospace', fontSize: '1.1rem', color: 'var(--text-main)' }}>{team.rollNumber}</div>
                 </div>
             </div>
 

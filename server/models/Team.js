@@ -19,7 +19,7 @@ const teamSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    transactionId: {
+    rollNumber: {
         type: String,
         required: true,
         unique: true

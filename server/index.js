@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 const allowedOrigins = [
     'http://localhost:5173', // Local development frontend
+    'http://localhost:5174', // Vite alternative dev port
     'https://e-sports-registration-freefire-web.vercel.app', // Production frontend
 ];
 
@@ -38,12 +39,12 @@ mongoose.connect(MONGODB_URI)
 // Routes
 app.post('/api/register', async (req, res) => {
     try {
-        const { teamName, players, backupPlayer, transactionId } = req.body;
+        const { teamName, players, backupPlayer, rollNumber } = req.body;
 
-        // Validate if transaction ID already exists
-        const existingTeam = await Team.findOne({ transactionId });
+        // Validate if roll number already exists
+        const existingTeam = await Team.findOne({ rollNumber });
         if (existingTeam) {
-            return res.status(400).json({ error: 'Transaction ID already used. Please provide a valid unique transaction ID.' });
+            return res.status(400).json({ error: 'College Roll Number already used. Please provide a valid unique Roll Number.' });
         }
 
         // Generate unique team ID
@@ -54,7 +55,7 @@ app.post('/api/register', async (req, res) => {
             teamName,
             players,
             backupPlayer,
-            transactionId
+            rollNumber
         });
 
         await newTeam.save();

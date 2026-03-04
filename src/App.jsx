@@ -130,7 +130,11 @@ const App = () => {
       setQrPayload(JSON.stringify({ teamId: response.data.teamId }));
       setIsRegistered(true);
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed. Please try again.");
+      let msg = err.response?.data?.error || "Registration failed. Please try again.";
+      if (typeof msg !== 'string') {
+        msg = JSON.stringify(msg);
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }

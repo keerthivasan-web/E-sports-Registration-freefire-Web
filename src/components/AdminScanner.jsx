@@ -34,9 +34,14 @@ const AdminScanner = ({ onBack }) => {
             const response = await api.get(`/api/team/${encodeURIComponent(teamId)}`);
             setTeamData(response.data);
         } catch (err) {
-            const msg = err.response?.data?.error
+            let msg = err.response?.data?.error
                 || err.message
                 || 'Failed to verify. Check network or team ID.';
+
+            // React Error #31 Fix: Ensure the error message is always a string before rendering it
+            if (typeof msg !== 'string') {
+                msg = JSON.stringify(msg);
+            }
             setError(msg);
             isScanningRef.current = false;
         } finally {

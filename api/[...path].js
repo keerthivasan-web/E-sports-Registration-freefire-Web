@@ -74,10 +74,11 @@ app.get('/api/team/:teamId', async (req, res) => {
 app.post('/api/team/:teamId/verify', async (req, res) => {
     try {
         await connectDB();
+        // { new: true } tells Mongoose to return the UPDATED document (not the old one)
         const team = await Team.findOneAndUpdate(
             { teamId: req.params.teamId },
             { isVerified: true },
-            { returnDocument: 'after' }
+            { new: true }
         );
         if (!team) return res.status(404).json({ error: 'Team not found' });
         res.json({ message: 'Team successfully verified', team });

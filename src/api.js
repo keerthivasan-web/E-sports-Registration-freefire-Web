@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Create an Axios instance
+// In production (Vercel), use relative path (same domain).
+// In development, point to the local Node.js backend.
 const api = axios.create({
-    // Vite sets import.meta.env.PROD to true when running `vite build`
     baseURL: import.meta.env.PROD
-        ? '' // Use relative path in production (same domain)
-        : `http://${window.location.hostname}:5000`,
+        ? ''  // same domain on Vercel
+        : 'http://localhost:5000', // local API for local dev
 });
 
 export default api;

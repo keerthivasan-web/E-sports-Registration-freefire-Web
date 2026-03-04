@@ -390,6 +390,17 @@ h6 {
   }
 }
 
+/* QR Scanner fix — prevent black screen */
+[data-testid="qr-scanner"] video,
+div[style*="border-radius: 16px"] video {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 250px;
+  background: #000;
+  object-fit: cover;
+}
+
 /* Fix iOS Safari 100vh issue */
 @supports (-webkit-touch-callout: none) {
   .app-container {

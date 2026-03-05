@@ -42,9 +42,14 @@ const BulletEffect = () => {
 const App = () => {
   const [viewMode, setViewMode] = useState('registration'); // 'registration', 'admin-login', 'admin'
   const [teamName, setTeamName] = useState('');
-  const [players, setPlayers] = useState(['', '', '', '']);
-  const [backupPlayer, setBackupPlayer] = useState('');
-  const [rollNumber, setRollNumber] = useState('');
+  const [players, setPlayers] = useState([
+    { uid: '', rollNumber: '' },
+    { uid: '', rollNumber: '' },
+    { uid: '', rollNumber: '' },
+    { uid: '', rollNumber: '' }
+  ]);
+  const [backupPlayer, setBackupPlayer] = useState({ uid: '', rollNumber: '' });
+  const [collegeName, setCollegeName] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const [qrPayload, setQrPayload] = useState('');
   const [loading, setLoading] = useState(false);
@@ -103,9 +108,9 @@ const App = () => {
     };
   }, []);
 
-  const handlePlayerChange = (index, value) => {
+  const handlePlayerChange = (index, field, value) => {
     const newPlayers = [...players];
-    newPlayers[index] = value;
+    newPlayers[index][field] = value;
     setPlayers(newPlayers);
   };
 
@@ -113,8 +118,8 @@ const App = () => {
     e.preventDefault();
     setError('');
 
-    if (!teamName || players.some(p => !p) || !backupPlayer || !rollNumber) {
-      setError('Please fill all required fields including your College Roll Number');
+    if (!teamName || players.some(p => !p.uid || !p.rollNumber) || !backupPlayer.uid || !backupPlayer.rollNumber || !collegeName) {
+      setError('Please fill all required fields including your College Name and all individual player Roll Numbers');
       return;
     }
 
@@ -122,9 +127,9 @@ const App = () => {
       setLoading(true);
       const response = await api.post('/api/register', {
         teamName,
-        players,
-        backupPlayer,
-        rollNumber
+        players: players.map(p => `${p.uid} - ${p.rollNumber}`),
+        backupPlayer: `${backupPlayer.uid} - ${backupPlayer.rollNumber}`,
+        collegeName
       });
 
       setQrPayload(JSON.stringify({ teamId: response.data.teamId }));
@@ -142,9 +147,14 @@ const App = () => {
 
   const handleReset = () => {
     setTeamName('');
-    setPlayers(['', '', '', '']);
-    setBackupPlayer('');
-    setRollNumber('');
+    setPlayers([
+      { uid: '', rollNumber: '' },
+      { uid: '', rollNumber: '' },
+      { uid: '', rollNumber: '' },
+      { uid: '', rollNumber: '' }
+    ]);
+    setBackupPlayer({ uid: '', rollNumber: '' });
+    setCollegeName('');
     setIsRegistered(false);
     setError('');
   };
@@ -313,16 +323,28 @@ const App = () => {
                   {players.map((player, index) => (
                     <div key={index} className="form-group" style={{ marginBottom: 0 }}>
                       <label className="form-label">
-                        Player {index + 1} ID or Name <span className="badge" style={{ marginLeft: 'auto', display: 'inline-block' }}>P{index + 1}</span>
+                        Player {index + 1} Details <span className="badge" style={{ marginLeft: 'auto', display: 'inline-block' }}>P{index + 1}</span>
                       </label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        placeholder={`FF Username or UID`}
-                        value={player}
-                        onChange={(e) => handlePlayerChange(index, e.target.value)}
-                        required
-                      />
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="FF UID/Name"
+                          value={player.uid}
+                          onChange={(e) => handlePlayerChange(index, 'uid', e.target.value)}
+                          required
+                          style={{ flex: '1 1 auto', minWidth: '150px' }}
+                        />
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="Roll No."
+                          value={player.rollNumber}
+                          onChange={(e) => handlePlayerChange(index, 'rollNumber', e.target.value)}
+                          required
+                          style={{ width: '120px', flex: '0 0 auto' }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -332,34 +354,46 @@ const App = () => {
                 </h4>
                 <div className="form-group" style={{ marginBottom: '2.5rem' }}>
                   <label className="form-label">
-                    Backup Player ID or Name <span className="badge badge-backup">SUB</span>
+                    Backup Player Details <span className="badge badge-backup">SUB</span>
                   </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Backup FF Username or UID"
-                    value={backupPlayer}
-                    onChange={(e) => setBackupPlayer(e.target.value)}
-                    required
-                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="FF UID/Name"
+                      value={backupPlayer.uid}
+                      onChange={(e) => setBackupPlayer({ ...backupPlayer, uid: e.target.value })}
+                      required
+                      style={{ flex: '1 1 auto', minWidth: '150px' }}
+                    />
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Roll No."
+                      value={backupPlayer.rollNumber}
+                      onChange={(e) => setBackupPlayer({ ...backupPlayer, rollNumber: e.target.value })}
+                      required
+                      style={{ width: '120px', flex: '0 0 auto' }}
+                    />
+                  </div>
                 </div>
 
                 <h4 style={{ color: 'var(--primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <QrCode size={18} /> College Roll Number
+                  <QrCode size={18} /> College Name
                 </h4>
                 <div className="form-group" style={{ marginBottom: '2.5rem' }}>
                   <div style={{ background: 'var(--bg-input)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', border: '1px dashed var(--primary)' }}>
-                    <p style={{ margin: 0, color: 'var(--text-main)', fontSize: '0.95rem' }}>Please enter your college roll number for verification.</p>
+                    <p style={{ margin: 0, color: 'var(--text-main)', fontSize: '0.95rem' }}>Please enter your college name.</p>
                   </div>
                   <label className="form-label">
-                    College Roll Number
+                    College Name
                   </label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="E.g., 21CS105"
-                    value={rollNumber}
-                    onChange={(e) => setRollNumber(e.target.value)}
+                    placeholder="E.g., ABC Engineering College"
+                    value={collegeName}
+                    onChange={(e) => setCollegeName(e.target.value)}
                     required
                   />
                 </div>
@@ -408,18 +442,18 @@ const App = () => {
                 <div>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Main Roster</span>
                   <ul style={{ listStyle: 'none', padding: 0, marginTop: '0.5rem' }}>
-                    {players.map((p, i) => <li key={i} style={{ padding: '0.25rem 0', fontWeight: 500, color: 'var(--text-main)' }}>{i + 1}. {p}</li>)}
+                    {players.map((p, i) => <li key={i} style={{ padding: '0.25rem 0', fontWeight: 500, color: 'var(--text-main)' }}>{i + 1}. {p.uid} - {p.rollNumber}</li>)}
                   </ul>
                 </div>
                 <div>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Reserve</span>
-                  <div style={{ marginTop: '0.5rem', padding: '0.25rem 0', fontWeight: 500, color: 'var(--secondary)' }}>{backupPlayer}</div>
+                  <div style={{ marginTop: '0.5rem', padding: '0.25rem 0', fontWeight: 500, color: 'var(--secondary)' }}>{backupPlayer.uid} - {backupPlayer.rollNumber}</div>
                 </div>
               </div>
 
               <div style={{ background: 'var(--bg-input)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', textAlign: 'left' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>College Details</span>
-                <div style={{ marginTop: '0.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Roll No: {rollNumber}</div>
+                <div style={{ marginTop: '0.5rem', fontWeight: 500, color: 'var(--text-main)' }}>{collegeName}</div>
               </div>
 
               <motion.button

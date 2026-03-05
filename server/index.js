@@ -1,8 +1,8 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import Team from './models/Team.js';
 
 dotenv.config();
 
@@ -30,35 +30,76 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ffmax';
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// SQLite Connection
+let db;
+async function initDB() {
+    if (db) return db;
+    db = await open({
+        filename: 'database.sqlite',
+        driver: sqlite3.Database
+    });
+
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS teams (
+            teamId TEXT PRIMARY KEY,
+            teamName TEXT NOT NULL,
+            players TEXT NOT NULL,
+            backupPlayer TEXT NOT NULL,
+            collegeName TEXT NOT NULL,
+            isVerified INTEGER DEFAULT 0,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    console.log('SQLite connected and tables checked');
+    return db;
+}
+
+initDB().catch(err => console.error('DB init err', err));
 
 // Routes
 app.post('/api/register', async (req, res) => {
     try {
-        const { teamName, players, backupPlayer, rollNumber } = req.body;
+        const database = await initDB();
+        const { teamName, players, backupPlayer, collegeName } = req.body;
 
-        // Validate if roll number already exists
-        const existingTeam = await Team.findOne({ rollNumber });
-        if (existingTeam) {
-            return res.status(400).json({ error: 'College Roll Number already used. Please provide a valid unique Roll Number.' });
+        const playersJson = JSON.stringify(players);
+
+        // Extract roll numbers from payload
+        const newRolls = players.map(p => {
+            const match = p.match(/- (.+)$/);
+            return match ? match[1].trim() : null;
+        }).filter(Boolean);
+
+        const bMatch = backupPlayer.match(/- (.+)$/);
+        if (bMatch) newRolls.push(bMatch[1].trim());
+
+        // Validate if roll number already exists globally
+        const allTeams = await database.all('SELECT players, backupPlayer FROM teams');
+        const existingRolls = new Set();
+        allTeams.forEach(t => {
+            try {
+                const pList = JSON.parse(t.players);
+                pList.forEach(p => {
+                    const match = p.match(/- (.+)$/);
+                    if (match) existingRolls.add(match[1].trim());
+                });
+            } catch (e) { }
+            const tbMatch = t.backupPlayer.match(/- (.+)$/);
+            if (tbMatch) existingRolls.add(tbMatch[1].trim());
+        });
+
+        const duplicate = newRolls.find(r => existingRolls.has(r));
+        if (duplicate) {
+            return res.status(400).json({ error: `Roll Number ${duplicate} is already registered by another player.` });
         }
 
         // Generate unique team ID
         const teamId = `FF-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
-        const newTeam = new Team({
-            teamId,
-            teamName,
-            players,
-            backupPlayer,
-            rollNumber
-        });
-
-        await newTeam.save();
+        await database.run(
+            'INSERT INTO teams (teamId, teamName, players, backupPlayer, collegeName, isVerified) VALUES (?, ?, ?, ?, ?, ?)',
+            [teamId, teamName, playersJson, backupPlayer, collegeName, 0]
+        );
 
         res.status(201).json({ teamId, message: 'Registration successful' });
     } catch (error) {
@@ -69,10 +110,15 @@ app.post('/api/register', async (req, res) => {
 
 app.get('/api/team/:teamId', async (req, res) => {
     try {
-        const team = await Team.findOne({ teamId: req.params.teamId });
+        const database = await initDB();
+        const team = await database.get('SELECT * FROM teams WHERE teamId = ?', [req.params.teamId]);
         if (!team) {
             return res.status(404).json({ error: 'Team not found' });
         }
+
+        team.players = JSON.parse(team.players);
+        team.isVerified = !!team.isVerified;
+
         res.json(team);
     } catch (error) {
         console.error('Fetch Team Error:', error);
@@ -82,15 +128,17 @@ app.get('/api/team/:teamId', async (req, res) => {
 
 app.post('/api/team/:teamId/verify', async (req, res) => {
     try {
-        const team = await Team.findOneAndUpdate(
-            { teamId: req.params.teamId },
-            { isVerified: true },
-            { new: true }
-        );
+        const database = await initDB();
 
-        if (!team) {
+        const result = await database.run('UPDATE teams SET isVerified = 1 WHERE teamId = ?', [req.params.teamId]);
+
+        if (result.changes === 0) {
             return res.status(404).json({ error: 'Team not found' });
         }
+
+        const team = await database.get('SELECT * FROM teams WHERE teamId = ?', [req.params.teamId]);
+        team.players = JSON.parse(team.players);
+        team.isVerified = !!team.isVerified;
 
         res.json({ message: 'Team successfully verified', team });
     } catch (error) {
